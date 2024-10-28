@@ -4,7 +4,13 @@ WORKDIR /app
 
 COPY . /app
 
-RUN pip install --no-cache-dir fastapi uvicorn
+
+RUN pip install --no-cache-dir \
+    fastapi \
+    uvicorn \
+    robotframework \
+    robotframework-requests \
+    requests
 
 EXPOSE 8000
 
