@@ -1,3 +1,5 @@
+# old code
+
 from fastapi import FastAPI, status
 from pydantic import BaseModel
 from cassandra.cluster import Cluster, NoHostAvailable
