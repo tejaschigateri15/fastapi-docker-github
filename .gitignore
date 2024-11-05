@@ -49,7 +49,7 @@ log/
 *.ipynb
 
 # Docker
-docker-compose.yml
+#docker-compose.yml
 docker-compose.override.yml
 .docker/
 
