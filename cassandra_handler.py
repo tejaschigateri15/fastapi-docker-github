@@ -58,6 +58,18 @@ class CassandraDataPopulator:
             })
         return books
 
+    def ret_specific_book(self, id):
+        query = "SELECT * FROM books WHERE id = %s"
+        book = self.session.execute(query, (id,))
+        books = []
+        for row in book:
+            books.append({
+                "id": str(row.id),
+                "name": row.name,
+                "author": row.author,
+            })
+        return books
+
     def close(self):
         if self.cluster:
             self.cluster.shutdown()

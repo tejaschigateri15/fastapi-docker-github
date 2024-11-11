@@ -84,6 +84,9 @@ Thumbs.db
 *.swo
 *.swn
 *.bak
-*.tmp
 *.pid
+*.tmp
+*.png
 .env.test
+fast-api-practice.py
+
