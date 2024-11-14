@@ -1,6 +1,6 @@
 from cassandra.cluster import Cluster
 import uuid
-from models import Book
+from models import Book,NewUser,LoginUser
 
 class CassandraDataPopulator:
     def __init__(self, host='cassandra', port=9042):
@@ -30,20 +30,17 @@ class CassandraDataPopulator:
                 author text,              
             )
         """)
+        self.session.execute(
+            """
+                CREATE TABLE IF NOT EXISTS user_records (
+                    username text PRIMARY KEY ,
+                    email text,
+                    password text
+                )
+            """
+        )
         print("Schema initialization complete")
 
-    def insert_book(self, book: Book):
-        query = """
-            INSERT INTO books (id, name, author)
-            VALUES (%s, %s, %s)
-        """
-        id = uuid.uuid4()
-        self.session.execute(query, (
-            id,
-            book.name,
-            book.author
-        ))
-        return id
 
     def get_all_books(self):
         query = "SELECT * FROM books"
@@ -58,6 +55,7 @@ class CassandraDataPopulator:
             })
         return books
 
+
     def ret_specific_book(self, id):
         query = "SELECT * FROM books WHERE id = %s"
         book = self.session.execute(query, (id,))
@@ -69,6 +67,45 @@ class CassandraDataPopulator:
                 "author": row.author,
             })
         return books
+
+
+    def insert_book(self, book: Book):
+        query = """
+            INSERT INTO books (id, name, author)
+            VALUES (%s, %s, %s)
+        """
+        id = uuid.uuid4()
+        self.session.execute(query, (
+            id,
+            book.name,
+            book.author
+        ))
+        return id
+
+
+    def create_new_user(self,user:NewUser):
+        query = "Insert into user_records (username,email,password) values (%s,%s,%s)"
+        self.session.execute(query,(user.username,user.email,user.password))
+        return {"message": f"{user.username} user created"}
+
+
+    def verify_user(self,login:LoginUser):
+        query = "select username,password from user_records where username = %s"
+        user = self.session.execute(query,(login.username,)).one()
+        print(user)
+        if not user:
+            return {"message": "User not found", "status": "error"}
+        elif login.password == user.password:
+            return {
+                "message": "Login successful",
+                "status": "success",
+                "username": user.username
+            }
+        else:
+            return {
+                "message": "Invalid password",
+                "status": "error"
+            }
 
     def close(self):
         if self.cluster:
